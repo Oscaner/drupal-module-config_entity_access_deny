@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Permission Access Deny module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\permission_access_deny\Form\PermissionAccessDenyConfigForm;
+
+/**
+ * Implements hook_form_config_entity_access_deny_config_form_alter().
+ */
+function permission_access_deny_form_config_entity_access_deny_config_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form[PermissionAccessDenyConfigForm::AFFECT_PERMISSION_KEY] = [
+    '#type' => 'fieldset',
+    '#title' => t('Affect permissions'),
+    '#description' => t('Please click <a href="@permission_access_deny">here</a> to access deny for permissions.', [
+      '@permission_access_deny' => Url::fromRoute('permission_access_deny.config')->toString(),
+    ]),
+    '#weight' => 2,
+  ];
+}

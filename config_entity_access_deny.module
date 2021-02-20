@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Config Entity Access Deny module.
+ */
+
+use Drupal\config_entity_access_deny\ConfigEntityAccessDenyHelper;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
+use Drupal\Core\Config\Entity\Query\Query;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function config_entity_access_deny_entity_type_build(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  if (isset($entity_types['node'])) {
+    $entity_types['node']->setAccessClass('\Drupal\config_entity_access_deny\Handler\NodeAccessControlHandler');
+  }
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function config_entity_access_deny_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  $entity_bundle = $entity->bundle();
+  $entity_type = \Drupal::entityTypeManager()->getDefinition($entity->getEntityTypeId());
+  if (ConfigEntityAccessDenyHelper::isDeniedEntityType($entity_bundle, $entity_type)) {
+    return AccessResult::forbidden();
+  }
+  // No opinion.
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_entity_list_builder_alter().
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3130233
+ */
+function config_entity_access_deny_entity_list_builder_alter(Query &$query, EntityTypeInterface $entity_type) {
+  if ($entity_type instanceof ConfigEntityTypeInterface) {
+    if ($settings = ConfigEntityAccessDenyHelper::getSettingsByEntityType($entity_type->id())) {
+      $query->condition($entity_type->getKey('id'), $settings, 'NOT IN');
+    }
+  }
+}
+
+/**
+ * Implements hook_form_views_exposed_form_alter().
+ */
+function config_entity_access_deny_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (
+    isset($form['type']['#options']) &&
+    ($options = $form['type']['#options']) &&
+    ($view = $form_state->getStorage()['view'] ?? NULL) &&
+    $view instanceof ViewExecutable &&
+    ($entity_type = $view->getBaseEntityType()) &&
+    $settings = ConfigEntityAccessDenyHelper::getSettingsByEntityType($entity_type->getBundleEntityType())
+  ) {
+    foreach ($options as $key => $label) {
+      if (in_array($key, $settings)) {
+        unset($form['type']['#options'][$key]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_user_form_alter().
+ */
+function config_entity_access_deny_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (
+    isset($form['account']['roles']['#options']) &&
+    ($options = $form['account']['roles']['#options']) &&
+    $settings = ConfigEntityAccessDenyHelper::getSettingsByEntityType('user_role')
+  ) {
+    foreach ($options as $id => $label) {
+      if (in_array($id, $settings)) {
+        unset($form['account']['roles']['#options'][$id]);
+      }
+    }
+  }
+}

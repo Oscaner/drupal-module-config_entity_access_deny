@@ -1,0 +1,23 @@
+{
+    "name": "drupal/config_entity_access_deny",
+    "description": "This module can hidden config entities in the system, not need remove the config entities.",
+    "type": "drupal-module",
+    "keywords": ["Drupal", "Config Entity"],
+    "authors": [
+        {
+            "name": "Kang Miao",
+            "email": "kang@ciandt.com"
+        }
+    ],
+    "require": {
+      "drupal/core": "^8 || ^9"
+    },
+    "extra": {
+      "patches": {
+          "drupal/core": {
+            "https://drupal.org/node/3130215": "https://www.drupal.org/files/issues/2020-04-23/check_access_in_layout_block_list.patch",
+            "https://drupal.org/node/3130233": "https://www.drupal.org/files/issues/2020-04-23/add_hook_to_entity_list_builder.patch"
+          }
+      }
+    }
+}

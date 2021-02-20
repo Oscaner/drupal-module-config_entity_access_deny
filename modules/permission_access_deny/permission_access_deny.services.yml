@@ -1,0 +1,11 @@
+services:
+  permission_access_deny.permission_handler:
+    class: Drupal\permission_access_deny\PermissionHandler
+    arguments: ['@module_handler', '@string_translation', '@controller_resolver']
+  permission_access_deny.permission_handler_decorator:
+    class: Drupal\permission_access_deny\Decorator\PermissionHandlerDecorator
+    public: false
+    decorates: user.permissions
+    decoration_on_invalid: ignore
+    decoration_priority: 1
+    arguments: ['@permission_access_deny.permission_handler_decorator.inner']

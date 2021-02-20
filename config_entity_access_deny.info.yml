@@ -1,0 +1,5 @@
+name: 'Config Entity Access Deny'
+description: 'Provides the tools to control Access Deny for Config Entity.'
+package: 'Access'
+type: module
+core: 8.x

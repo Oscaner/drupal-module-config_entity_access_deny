@@ -1,0 +1,7 @@
+permission_access_deny.config:
+  path: '/admin/config/system/config-entity/access-deny/permission'
+  defaults:
+    _form: '\Drupal\permission_access_deny\Form\PermissionAccessDenyConfigForm'
+    _title: 'Permission'
+  requirements:
+    _permission: 'administer config entity access deny configurations'

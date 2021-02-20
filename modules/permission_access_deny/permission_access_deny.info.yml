@@ -1,0 +1,7 @@
+name: 'Permission Access Deny'
+description: 'Provides the tools to disable permissions.'
+package: 'Access'
+type: module
+core: 8.x
+dependencies:
+  - config_entity_access_deny:config_entity_access_deny

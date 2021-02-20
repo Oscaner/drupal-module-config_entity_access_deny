@@ -1,0 +1,23 @@
+services:
+  config_entity_access_deny.access_checker:
+    class: Drupal\config_entity_access_deny\Access\ConfigEntityAccessDenyCheck
+    tags:
+      - { name: access_check, applies_to: _config_entity_access_deny }
+  config_entity_access_deny.route_subscriber:
+    class: Drupal\config_entity_access_deny\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  config_entity_access_deny.toolbar_menu_tree_decorator:
+    class: Drupal\config_entity_access_deny\Decorator\ToolbarMenuTreeDecorator
+    public: false
+    decorates: toolbar.menu_tree
+    decoration_on_invalid: ignore
+    decoration_priority: 1
+    arguments: ['@config_entity_access_deny.toolbar_menu_tree_decorator.inner', '@config.factory', '@access_manager', '@current_user', '@module_handler', '@router.route_provider']
+  config_entity_access_deny.node_add_access_check_decorator:
+    class: Drupal\config_entity_access_deny\Decorator\NodeAddAccessCheckDecorator
+    public: false
+    decorates: access_check.node.add
+    decoration_on_invalid: ignore
+    decoration_priority: 1
+    arguments: ['@config_entity_access_deny.node_add_access_check_decorator.inner', '@entity_type.manager']

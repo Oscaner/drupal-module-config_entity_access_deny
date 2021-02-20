@@ -1,0 +1,3 @@
+administer config entity access deny configurations:
+  title: 'Administer Config Entity Access Deny Configurations'
+  description: 'Allows the user to administer config entity access deny configurations'
